@@ -13,15 +13,17 @@ let options = {
   nullTitle: "空标题"
 }
 
-var toc = new Toc(document.getElementsByClassName('post')[0], options)
-document.querySelector("#toc").append(toc.dom)
+var toc = new Toc(document.querySelector("#post"), options)
+document.querySelector("#toc").append(toc.tocEl)
 ```
 
 # options
 
-**nullTitle: string**
+### nullTitle:String
 
-父级标题为空时，父级标题显示的内容，默认为空，档设置文字时会被解析为文字内容，如：
+> default： ""
+
+父级标题为空时，父级标题显示的内容，默认为空，当设置文字时会被解析为文字内容，如：
 
 ```
 ## 二级标题
@@ -32,9 +34,32 @@ document.querySelector("#toc").append(toc.dom)
 会被解析为：
 
 ```html
-
+<ul>
+  <li>
+    <a href="#空标题">空标题</a>
+    <ul>
+      <li>
+        <a href="#二级标题">二级标题</a>
+      </li>
+      <li>
+        <a href="#二级标题">二级标题</a>
+        <ul>
+          <li>
+            <a href="#空标题">空标题</a>
+            <ul>
+              <li>
+                <a href="#四级标题">四级标题</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
 ```
 
+效果为：
 
 ```
 - 空标题
@@ -44,3 +69,8 @@ document.querySelector("#toc").append(toc.dom)
     - 四级标题
 ```
 
+### anch:Boolean
+
+> default: true
+
+是否自动为 HTML 添加锚点

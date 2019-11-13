@@ -1,0 +1,19 @@
+ul{
+  padding-left: 25px;
+  margin: 0;
+}
+.wrapper{
+  display: flex;
+  width: 100%;
+}
+#post{
+  width: 70%;
+}
+#top-wrapper{
+  position: relative;
+}
+#toc{
+  border: 5px solid pink;
+  padding: 20px;
+  position: fixed;
+}

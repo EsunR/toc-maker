@@ -24,7 +24,8 @@ export default class TocObj {
         for (var i = level; i < this.sectionNumbers.length; i++) {
           this.sectionNumbers[i] = 0;
         }
-        link.href = "#TOC" + this.sectionNumbers.slice(0, level).join('.');
+        link.index = "#TOC" + this.sectionNumbers.slice(0, level).join('.');
+        link.href = "#" + header.innerHTML
 
         // 创建一个 li 元素并插入到当前 ul 中
         var li = document.createElement('li');
