@@ -1,5 +1,9 @@
-import Toc from "../src/index.js";
+import Toc from '../src/index.js'
 window.onload = function() {
-  var toc = new Toc(document.querySelector("#post"));
-  document.querySelector("#toc").append(toc.tocEl);
-};
+  var options = {
+    autoCompletion: false,
+    deep: 3
+  }
+  var toc = new Toc(document.querySelector('#post'), options)
+  document.querySelector('#toc').append(toc.tocEl)
+}

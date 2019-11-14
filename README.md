@@ -74,3 +74,15 @@ document.querySelector("#toc").append(toc.tocEl)
 > default: true
 
 是否自动为 HTML 添加锚点
+
+### autoCompletion:Boolean
+
+> default: true
+
+是否严格补全header级别
+
+### deep:Number
+
+> default: 6 (max)
+
+目录可显示的深度
