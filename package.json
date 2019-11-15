@@ -1,6 +1,6 @@
 {
   "name": "toc-maker",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "由文章HTML文本动态生成文章目录",
   "main": "./src/index.js",
   "scripts": {
