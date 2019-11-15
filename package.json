@@ -1,7 +1,7 @@
 {
   "name": "toc-maker",
   "version": "1.2.0",
-  "description": "根据 HTML DOM 生成 TOC",
+  "description": "由文章HTML文本动态生成文章目录",
   "main": "./src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
