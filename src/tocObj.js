@@ -24,14 +24,13 @@ export default class TocObj {
     // 如果当前节点为 ul
     if (flag) {
       if (this.options.deep < this.deep) {
-        return;
+        return
       }
       this.el.setAttribute('data-deep', this.deep)
       // 如果将要处理的 header 等级与当前的 ul 等级相匹配
       // 那就创建一个 li 将其存放
       if (level == this.level) {
         var link = document.createElement('a')
-        link.href = ''
         link.innerHTML = header.innerHTML
         // 记录标题计数器
         this.sectionNumbers[level - 1]++
@@ -43,7 +42,12 @@ export default class TocObj {
           this.sectionNumbers.slice(0, level).join('.')
         )
         link.setAttribute('data-level', level)
-        link.href = '#' + header.id
+        if (header.id) {
+          link.setAttribute('data-header', header.id)
+          if (this.options.href) {
+            link.href = '#' + header.id
+          }
+        }
         // 创建一个 li 元素并插入到当前 ul 中
         var li = document.createElement('li')
         li.insertBefore(link, li.firstChild)

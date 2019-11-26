@@ -11,6 +11,9 @@ export default class Toc {
     if (options.anch === undefined) {
       options.anch = true
     }
+    if (options.href === undefined) {
+      options.href = true
+    }
     if (options.deep === undefined || options.deep > 6) {
       options.deep = 6
     }

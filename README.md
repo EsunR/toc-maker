@@ -81,6 +81,12 @@ document.querySelector("#toc").append(toc.tocEl)
 
 是否自动为 HTML 添加锚点
 
+### href:Boolean
+
+> default: true
+
+是否为生成的目录生成 href 属性，自动生成 href 会改写url，这一点对 SPA 应用很不友好，可以选择手动关闭该选项。依据生成的 `<a>` 标签的 `data-header` 属性也可以追踪到对应的标题 id。
+
 ### autoCompletion:Boolean
 
 > default: true
