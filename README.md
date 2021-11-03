@@ -75,26 +75,40 @@ document.querySelector("#toc").append(toc.tocEl)
     - 四级标题
 ```
 
-### anch:Boolean
-
-> default: true
-
-是否自动为 HTML 添加锚点
-
-### href:Boolean
-
-> default: true
-
-是否为生成的目录生成 href 属性，自动生成 href 会改写url，这一点对 SPA 应用很不友好，可以选择手动关闭该选项。依据生成的 `<a>` 标签的 `data-header` 属性也可以追踪到对应的标题 id。
-
 ### autoCompletion:Boolean
 
 > default: true
 
-是否严格补全header级别
+是否严格补全 heading 级别，如果设置为 `false` 后，如果文章的标题顺序不正确，则无法渲染标题
 
 ### deep:Number
 
 > default: 6 (max)
 
-目录可显示的深度
+目录可显示的深度，最多仅在目录中显示到 H6
+
+### scrollContainer:Element
+
+> default: window
+
+滚动元素的容器，如果没有正确设置，跳转与平滑效果会失效
+
+### hashMode:Boolean
+
+> default: true
+
+是否启用路由 Hash，开启后会自动监听用户滚动到的文章位置，并将当前的文章标题写入路由 Hash；同时如果用户进入当前页面时，路由存在 Hash，会自动定位到标题位置。
+
+但是如果你使用了 Hash 模式作为你 SPA 应用的路由路径（如 vue-router 的 Hash 模式），开启 hashMode 后会对你的路由造成影响，你可以选择关闭此选项。
+
+### smoothScroll:Boolean
+
+> default: true
+
+是否启用平滑跳转
+
+### tocActiveClass:String
+
+> default: "toc-active"
+
+当文章滚动到某一标题时，目录中对应的该项会被添加上该 class

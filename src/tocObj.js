@@ -1,65 +1,116 @@
+import { scrollToTarget } from "./utils.js";
+import { UPDATE_ACTIVE_HEADING_EVENT, SCROLL_TIME } from "./constance.js";
+
 export default class TocObj {
-  /**
-   *
-   * @param {Element} el 父级元素
-   * @param {String} level 创建当前项header的等级
-   * @param {Array} sectionNumbers 索引列表
-   * @param {Object} options 用户设置项
-   * @param {Number} deep 当前ul的深度
-   */
-  constructor(el, level, sectionNumbers, options, deep = 1) {
-    this.el = el
-    this.el.circular = this
-    this.level = level
-    this.sectionNumbers = sectionNumbers
-    this.options = options
-    this.deep = deep
+  constructor(
+    el,
+    toc,
+    deep = 1,
+    level = 1,
+    sectionNumbers = [0, 0, 0, 0, 0, 0]
+  ) {
+    this.el = el;
+    this.el.circular = this;
+    this.toc = toc;
+    this.options = toc.options;
+    this.deep = deep;
+    this.level = level;
+    this.sectionNumbers = sectionNumbers;
     // 当前节点的数量
-    this.num = 0
+    this.num = 0;
   }
-  add(header) {
-    var flag = this.el.tagName == 'UL' // ul节点和li节点处理header的方式不通过
-    var level = parseInt(header.tagName.charAt(1))
+
+  /**
+   * 为 Toc 对象添加标题
+   * @param {HTMLHeadingElement} heading
+   * @returns
+   */
+  add(heading) {
+    let level = Number(heading.tagName.charAt(1));
 
     // 如果当前节点为 ul
-    if (flag) {
+    if (this.el.tagName == "UL") {
+      // 检查是否在该深度停止生成目录解构
       if (this.options.deep < this.deep) {
-        return
+        return;
       }
-      this.el.setAttribute('data-deep', this.deep)
-      // 如果将要处理的 header 等级与当前的 ul 等级相匹配
+      this.el.setAttribute("data-deep", this.deep);
+
+      // 如果将要处理的 heading 等级与当前的 ul 等级相匹配
       // 那就创建一个 li 将其存放
       if (level == this.level) {
-        var link = document.createElement('a')
-        link.innerHTML = header.innerHTML
+        let link = document.createElement("a");
+        link.innerHTML = heading.innerHTML;
+
         // 记录标题计数器
-        this.sectionNumbers[level - 1]++
-        for (var i = level; i < this.sectionNumbers.length; i++) {
-          this.sectionNumbers[i] = 0
+        this.sectionNumbers[level - 1]++;
+        for (let i = level; i < this.sectionNumbers.length; i++) {
+          this.sectionNumbers[i] = 0;
         }
+
+        // 设置各个目录项 HTML Attribute
         link.setAttribute(
-          'data-index',
-          this.sectionNumbers.slice(0, level).join('.')
-        )
-        link.setAttribute('data-level', level)
-        if (header.id) {
-          link.setAttribute('data-header', header.id)
-          if (this.options.href) {
-            link.href = '#' + header.id
+          "data-index",
+          this.sectionNumbers.slice(0, level).join(".")
+        );
+        link.setAttribute("data-level", level);
+        if (heading.id) {
+          link.setAttribute("data-heading", heading.id);
+          // 当 toc 实例中的 activeHeading 发生改变时，修改目录中对应元素的 class
+          this.toc._eventHub.addEventListener(
+            UPDATE_ACTIVE_HEADING_EVENT,
+            (newActiveHeading) => {
+              if (newActiveHeading.id === link.getAttribute("data-heading")) {
+                link.classList.add(this.options.tocActiveClass)
+              } else {
+                link.classList.remove(this.options.tocActiveClass)
+              }
+            }
+          );
+          // 如果启用锚点选项，使用锚点进行跳转
+          if (this.options.hashMode) {
+            link.href = "#" + heading.id;
+            if (this.options.smoothScroll) {
+              this.options.scrollContainer.style.scrollBehavior = "smooth";
+            }
+            // 记录当前正在跳转的目标元素
+            link.addEventListener("click", () => {
+              this.toc._scrollingTarget = heading;
+              if (this.toc._scrollingTargetCleanTimer) {
+                clearTimeout(this.toc._scrollingTargetCleanTimer);
+              }
+              this.toc._scrollingTargetCleanTimer = setTimeout(() => {
+                this.toc._scrollingTarget = null;
+              }, SCROLL_TIME);
+            });
+          }
+          // 如果关闭锚点选项，使用 scrollTo 进行跳转
+          else {
+            link.addEventListener("click", () => {
+              scrollToTarget(heading.id, this.options);
+            });
           }
         }
+
         // 创建一个 li 元素并插入到当前 ul 中
-        var li = document.createElement('li')
-        li.insertBefore(link, li.firstChild)
-        this.num++
-        this.el.appendChild(
-          new TocObj(li, level, this.sectionNumbers, this.options, this.deep).el
-        )
+        let li = document.createElement("li");
+        li.insertBefore(link, li.firstChild);
+        this.num++;
+
+        // 创建新的 Toc 对象，并插入到当前的元素节点中
+        const newTocObj = new TocObj(
+          li,
+          this.toc,
+          this.deep,
+          level,
+          this.sectionNumbers
+        );
+        this.el.appendChild(newTocObj.el);
       }
-      // 如果当前 header 的等级大于当前 ul 等级
+      // 如果当前 heading 的等级大于当前 ul 等级
       else if (level > this.level) {
-        var lastChild = this.el.lastChild
-        lastChild.circular.add(header) // 让ul节点的li节点去处理header
+        let lastChild = this.el.lastChild;
+        lastChild.circular.add(heading); // 让ul节点的li节点去处理heading
       }
     }
 
@@ -67,20 +118,20 @@ export default class TocObj {
     else {
       // 没有ul子节点，就创建一个
       if (this.num == 0) {
-        var ul = document.createElement('ul')
+        let ul = document.createElement("ul");
         let newObj = new TocObj(
           ul,
+          this.toc,
+          this.deep + 1,
           level,
-          this.sectionNumbers,
-          this.options,
-          this.deep + 1
-        )
-        this.el.appendChild(newObj.el)
-        this.num++
-        newObj.add(header)
+          this.sectionNumbers
+        );
+        this.el.appendChild(newObj.el);
+        this.num++;
+        newObj.add(heading);
       } else {
-        var lastChild = this.el.lastChild
-        lastChild.circular.add(header)
+        let lastChild = this.el.lastChild;
+        lastChild.circular.add(heading);
       }
     }
   }
